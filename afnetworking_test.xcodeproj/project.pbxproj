@@ -15,6 +15,7 @@
 		8188F66F1D79405B000BF3FF /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8188F66E1D79405B000BF3FF /* Images.xcassets */; };
 		8188F6721D79405B000BF3FF /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8188F6701D79405B000BF3FF /* LaunchScreen.xib */; };
 		8188F67E1D79405B000BF3FF /* afnetworking_testTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8188F67D1D79405B000BF3FF /* afnetworking_testTests.m */; };
+		E35F8A651D7D481D0081E5A5 /* holder.png in Resources */ = {isa = PBXBuildFile; fileRef = E35F8A641D7D481D0081E5A5 /* holder.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +45,7 @@
 		8188F67C1D79405B000BF3FF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8188F67D1D79405B000BF3FF /* afnetworking_testTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = afnetworking_testTests.m; sourceTree = "<group>"; };
 		A7401205FA6FE8908DCA1327 /* Pods-afnetworking_test.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-afnetworking_test.debug.xcconfig"; path = "Pods/Target Support Files/Pods-afnetworking_test/Pods-afnetworking_test.debug.xcconfig"; sourceTree = "<group>"; };
+		E35F8A641D7D481D0081E5A5 /* holder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = holder.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +79,7 @@
 		8188F6551D79405B000BF3FF = {
 			isa = PBXGroup;
 			children = (
+				E35F8A641D7D481D0081E5A5 /* holder.png */,
 				8188F6601D79405B000BF3FF /* afnetworking_test */,
 				8188F67A1D79405B000BF3FF /* afnetworking_testTests */,
 				8188F65F1D79405B000BF3FF /* Products */,
@@ -229,6 +232,7 @@
 				8188F66D1D79405B000BF3FF /* Main.storyboard in Resources */,
 				8188F6721D79405B000BF3FF /* LaunchScreen.xib in Resources */,
 				8188F66F1D79405B000BF3FF /* Images.xcassets in Resources */,
+				E35F8A651D7D481D0081E5A5 /* holder.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -421,6 +425,7 @@
 			baseConfigurationReference = A7401205FA6FE8908DCA1327 /* Pods-afnetworking_test.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = afnetworking_test/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -432,6 +437,7 @@
 			baseConfigurationReference = 1D8770E94AC4404B741E87B5 /* Pods-afnetworking_test.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = afnetworking_test/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";

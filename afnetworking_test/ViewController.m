@@ -21,6 +21,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.tableView.rowHeight = 100;
     // Do any additional setup after loading the view, typically from a nib.
 
     NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
@@ -30,16 +31,19 @@
     NSURLRequest *request = [NSURLRequest requestWithURL:URL];
     
     NSURLSessionDataTask *dataTask = [manager dataTaskWithRequest:request completionHandler:^(NSURLResponse *response, id responseObject, NSError *error) {
-        if (error) {
+        if (error || responseObject == nil) {
             NSLog(@"Error: %@", error);
         } else {
             //NSLog(@"%@ %@", response, responseObject);
             
-            NSError *error = nil;
-            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:responseObject options:0 error:&error];
-            NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error:nil];
+        
+            //이부분은 불필요 합니다.
+            //initWithSessionConfiguration부분을 잘 살펴보세요.
             
-            results = [dic objectForKey:@"results"];
+//            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:responseObject options:0 error:&error];
+//            NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseObject options:NSJSONReadingMutableContainers error:nil];
+            
+            results = [responseObject objectForKey:@"results"];
             
             [self.tableView reloadData];
             
@@ -60,13 +64,14 @@
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark - UITableViewDataSource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     //NSLog(@"count = %d", [results count]);
     return [results count];
 }
 
-- (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *SimpleTableIdentifier = @"cell";
     
@@ -81,7 +86,7 @@
     
     
     NSString *urlString = [NSString stringWithFormat:@"http://image.tmdb.org/t/p/w500%@", [dic objectForKey:@"poster_path"]];
-    [cell.imageView setImageWithURL:[NSURL URLWithString:urlString]];
+    [cell.imageView setImageWithURL:[NSURL URLWithString:urlString] placeholderImage:[UIImage imageNamed:@"holder"]];
     
     /*
     NSURL *url = [NSURL URLWithString:urlString];
