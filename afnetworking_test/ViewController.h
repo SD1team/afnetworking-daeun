@@ -8,10 +8,15 @@
 
 #import <UIKit/UIKit.h>
 
+#import <AFNetworking/UIImageView+AFNetworking.h>
+
 @interface ViewController : UIViewController<UITableViewDelegate, UITableViewDataSource>
 
 
+@property (strong, nonatomic) IBOutlet UITableView *tableView;
+
 @property (copy, nonatomic) NSArray *results;
+
 
 @end
 

@@ -17,14 +17,17 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <connections>
-                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="NqC-xg-GVf"/>
-                                    <outlet property="delegate" destination="BYZ-38-t0r" id="i0r-hp-mZ8"/>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="I1q-rK-585"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="X2A-wy-xCF"/>
                                 </connections>
                             </tableView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
+                    <connections>
+                        <outlet property="tableView" destination="swj-m0-T4g" id="Cct-Mv-Erj"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>

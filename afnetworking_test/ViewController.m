@@ -9,6 +9,7 @@
 #import "ViewController.h"
 #import <AFNetworking/AFNetworking.h>
 
+
 @interface ViewController ()
 
 @end
@@ -40,6 +41,8 @@
             
             results = [dic objectForKey:@"results"];
             
+            [self.tableView reloadData];
+            
             for (id dic in results)
             {
                 //NSLog(@"poster_path = %@", [dic objectForKey:@"poster_path"]);
@@ -59,12 +62,13 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
+    //NSLog(@"count = %d", [results count]);
     return [results count];
 }
 
 - (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *SimpleTableIdentifier = @"SimpleTableIdentifier";
+    static NSString *SimpleTableIdentifier = @"cell";
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier: SimpleTableIdentifier];
     if(cell == nil)
@@ -74,9 +78,20 @@
     
     NSDictionary *dic = [results objectAtIndex:indexPath.row];
     cell.textLabel.text = [dic objectForKey:@"title"];
+    
+    
+    NSString *urlString = [NSString stringWithFormat:@"http://image.tmdb.org/t/p/w500%@", [dic objectForKey:@"poster_path"]];
+    [cell.imageView setImageWithURL:[NSURL URLWithString:urlString]];
+    
+    /*
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSData *data = [NSData dataWithContentsOfURL:url];
+    UIImage *image = [[UIImage alloc] initWithData:data];
+    cell.imageView.image = image;
+    */
+    
     return cell;
 
 }
-
 
 @end
