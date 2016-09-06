@@ -19,7 +19,7 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
 
 @implementation ViewController
 
-@synthesize results, key, section, sortedDays;
+@synthesize results, key, section;
 
 
 - (void)viewDidLoad {
@@ -44,25 +44,7 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
             self.key = [NSMutableArray array];
             
             [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:SectionsTableIdentifier];
-            
-         /*   for (NSDictionary *section in results)
-            {
-                
-                NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
-                [dateFormatter setDateFormat:@"yyyy-MM-dd"];
-                NSDate* date = [dateFormatter dateFromString:[section objectForKey:@"release_date"]];
-                
-                
-                if ([self.key containsObject:date]) {
-                    [[section objectForKey:date] addObject:section];
-                }
-                
-                [self.key addObject:date];
-                key = [[NSMutableArray alloc] init];
-                [key addObject:dic];
-                [self.section setObject:key forKey:date];
-            }
-           */
+         
             
             for (NSDictionary *dic in results)
             {
@@ -93,11 +75,8 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
         
         [self.tableView reloadData];
         
-        
         //NSLog(@"self.date = %@", date);
         NSLog(@"self.key = %@", self.key);
-        
-        
         
     }];
     
@@ -151,7 +130,6 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:SectionsTableIdentifier];
     }
     
-   // dic = [results objectAtIndex:indexPath.row];
     
     
     NSString *urlString = [NSString stringWithFormat:@"http://image.tmdb.org/t/p/w500%@", [section objectForKey:@"poster_path"]];

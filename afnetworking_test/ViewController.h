@@ -17,8 +17,7 @@
 
 @property (copy, nonatomic) NSArray *results;
 @property (copy, nonatomic) NSMutableArray *key;
-@property (strong, nonatomic) NSMutableArray *sortedDays;
-@property (nonatomic, retain) NSMutableDictionary *section;
+@property (strong, nonatomic) NSMutableDictionary *section;
 
 
 @end
