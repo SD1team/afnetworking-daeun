@@ -14,16 +14,19 @@
 
 @end
 
+
+static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
+
 @implementation ViewController
 
-@synthesize results;
+@synthesize results, key, section, sortedDays;
 
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.tableView.rowHeight = 100;
     // Do any additional setup after loading the view, typically from a nib.
-
+    
     NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
     AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:configuration];
     
@@ -34,26 +37,68 @@
         if (error || responseObject == nil) {
             NSLog(@"Error: %@", error);
         } else {
-            //NSLog(@"%@ %@", response, responseObject);
-            
-        
-            //이부분은 불필요 합니다.
-            //initWithSessionConfiguration부분을 잘 살펴보세요.
-            
-//            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:responseObject options:0 error:&error];
-//            NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseObject options:NSJSONReadingMutableContainers error:nil];
             
             results = [responseObject objectForKey:@"results"];
             
-            [self.tableView reloadData];
+            self.section = [NSMutableDictionary dictionary];
+            self.key = [NSMutableArray array];
             
-            for (id dic in results)
+            [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:SectionsTableIdentifier];
+            
+         /*   for (NSDictionary *section in results)
             {
-                //NSLog(@"poster_path = %@", [dic objectForKey:@"poster_path"]);
-                NSLog(@"title = %@", [dic objectForKey:@"title"]);
+                
+                NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
+                [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+                NSDate* date = [dateFormatter dateFromString:[section objectForKey:@"release_date"]];
+                
+                
+                if ([self.key containsObject:date]) {
+                    [[section objectForKey:date] addObject:section];
+                }
+                
+                [self.key addObject:date];
+                key = [[NSMutableArray alloc] init];
+                [key addObject:dic];
+                [self.section setObject:key forKey:date];
             }
-      
+           */
+            
+            for (NSDictionary *dic in results)
+            {
+                // Reduce event start date to date components (year, month, day)
+              
+                //NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
+                //[dateFormatter setDateFormat:@"yyyy-MM-dd"];
+                //NSDate* date = [dateFormatter dateFromString:[dic objectForKey:@"release_date"]];
+                
+                NSDate* date = [dic objectForKey:@"release_date"];
+                
+                // If we don't yet have an array to hold the events for this day, create one
+                NSMutableArray *eventsOnThisDay = [self.section objectForKey:date];
+                if (eventsOnThisDay == nil) {
+                    eventsOnThisDay = [NSMutableArray array];
+                    
+                    // Use the reduced date as dictionary key to later retrieve the event list this day
+                    [self.section setObject:eventsOnThisDay forKey:date];
+                }
+                
+                // Add the event to the list for this day
+                [eventsOnThisDay addObject:dic];
+            }
+            NSArray *unsortedDays = [self.section allKeys];
+            self.key = [unsortedDays sortedArrayUsingSelector:@selector(compare:)];
         }
+        
+        
+        [self.tableView reloadData];
+        
+        
+        //NSLog(@"self.date = %@", date);
+        NSLog(@"self.key = %@", self.key);
+        
+        
+        
     }];
     
     [dataTask resume];
@@ -65,38 +110,64 @@
 }
 
 #pragma mark - UITableViewDataSource
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    // Return the number of sections.
+    
+    return [self.key count];
+}
+
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    //NSLog(@"count = %d", [results count]);
-    return [results count];
+    
+    NSDate *keys = key[section];
+    NSMutableArray *dateSection = self.section[keys];
+    return [dateSection count];
+    
 }
+
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    
+    return self.key[section];
+}
+
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *SimpleTableIdentifier = @"cell";
     
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier: SimpleTableIdentifier];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:SectionsTableIdentifier];
+    
+    NSDate* dateKey = self.key[indexPath.section];
+    NSMutableArray* dataArry = [self.section objectForKey:dateKey];
+    NSDictionary* section = [dataArry objectAtIndex:indexPath.row];
+    
+    
     if(cell == nil)
     {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:SimpleTableIdentifier];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:SectionsTableIdentifier];
     }
     
-    NSDictionary *dic = [results objectAtIndex:indexPath.row];
-    cell.textLabel.text = [dic objectForKey:@"title"];
+   // dic = [results objectAtIndex:indexPath.row];
     
     
-    NSString *urlString = [NSString stringWithFormat:@"http://image.tmdb.org/t/p/w500%@", [dic objectForKey:@"poster_path"]];
+    NSString *urlString = [NSString stringWithFormat:@"http://image.tmdb.org/t/p/w500%@", [section objectForKey:@"poster_path"]];
     [cell.imageView setImageWithURL:[NSURL URLWithString:urlString] placeholderImage:[UIImage imageNamed:@"holder"]];
     
     /*
-    NSURL *url = [NSURL URLWithString:urlString];
-    NSData *data = [NSData dataWithContentsOfURL:url];
-    UIImage *image = [[UIImage alloc] initWithData:data];
-    cell.imageView.image = image;
-    */
+     NSURL *url = [NSURL URLWithString:urlString];
+     NSData *data = [NSData dataWithContentsOfURL:url];
+     UIImage *image = [[UIImage alloc] initWithData:data];
+     cell.imageView.image = image;
+     */
+    
+    cell.textLabel.text = [section objectForKey:@"title"];
     
     return cell;
-
+    
 }
 
 @end

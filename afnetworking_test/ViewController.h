@@ -10,13 +10,15 @@
 
 #import <AFNetworking/UIImageView+AFNetworking.h>
 
-@interface ViewController : UIViewController<UITableViewDelegate, UITableViewDataSource>
+@interface ViewController : UIViewController<UITableViewDataSource,UITableViewDelegate>
 
 
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
 
 @property (copy, nonatomic) NSArray *results;
+@property (copy, nonatomic) NSMutableArray *key;
+@property (strong, nonatomic) NSMutableArray *sortedDays;
+@property (nonatomic, retain) NSMutableDictionary *section;
 
 
 @end
-
