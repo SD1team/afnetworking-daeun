@@ -76,30 +76,160 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
         
         [self.tableView reloadData];
         
-        
-        
         //NSLog(@"self.date = %@", date);
         // NSLog(@"self.key = %@", self.key);
         
     }];
     
     [dataTask resume];
-    [self initLayout];
+    [self initCustomRefreshControl];
     
 }
 
+#pragma mark - PullToRefresh
 
 /**
- * 레이아웃 초기화
+ * Custom RefreshControl 초기화
  */
+- (void)initCustomRefreshControl {
+    refreshControl = [[UIRefreshControl alloc] init];
+    
+    // UIRefreshControl 배경
+    self.refreshColorView = [[UIView alloc] initWithFrame:refreshControl.bounds];
+    self.refreshColorView.backgroundColor = [UIColor clearColor];
+    self.refreshColorView.alpha = 0.30;
+    
+    // 로딩이미지의 투명배경
+    self.refreshLoadingView = [[UIView alloc] initWithFrame:refreshControl.bounds];
+    self.refreshLoadingView.backgroundColor = [UIColor clearColor];
+    
+    // 로딩 이미지
+    self.loadingImg = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ic_favorite_18pt.png"]];
+    
+    [self.refreshLoadingView addSubview:self.loadingImg];
+    self.refreshLoadingView.clipsToBounds = YES;
+    
+    // 기존 로딩이미지 icon 숨기기
+    refreshControl.tintColor = [UIColor clearColor];
+    
+    [refreshControl addSubview:self.refreshColorView];
+    [refreshControl addSubview:self.refreshLoadingView];
+    
+    self.isRefreshAnimating = NO;
+    
+    // 리프레시 이벤트 연결
+    [refreshControl addTarget:self action:@selector(handleRefreshForCustom:) forControlEvents:UIControlEventValueChanged];
+    
+    [_tableView addSubview:refreshControl];
+}
+
+/**
+ * 리프레시 이벤트 for Custom
+ */
+- (void)handleRefreshForCustom:(UIRefreshControl *)sender {
+    
+    // -- DO SOMETHING AWESOME (... or just wait 3 seconds) --
+    // This is where you'll make requests to an API, reload data, or process information
+    double delayInSeconds = 3.0;
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+        
+        // When done requesting/reloading/processing invoke endRefreshing, to close the control
+        [refreshControl endRefreshing];
+    });
+    // -- FINISHED SOMETHING AWESOME, WOO! --
+}
+
+/**
+ * 테이블뷰 스크롤시 이벤트
+ * 로딩이미지 위치 계산
+ */
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+
+    // RefreshControl 크기
+    CGRect refreshBounds = refreshControl.bounds;
+    
+    // 테이블뷰 당겨진 거리 >= 0
+    CGFloat pullDistance = MAX(0.0, - refreshControl.frame.origin.y);
+    
+    // 테이블뷰이 Width의 중간
+    CGFloat midX = _tableView.frame.size.width / 2.0;
+    
+    // 로딩이미지 RefreshControl의 중간에 위치하도록 계산
+    CGFloat loadingImgHeight = self.loadingImg.bounds.size.height;
+    CGFloat loadingImgHeightHalf = loadingImgHeight / 2.0;
+    
+    CGFloat loadingImgWidth = self.loadingImg.bounds.size.width;
+    CGFloat loadingImgWidthHalf = loadingImgWidth / 2.0;
+    
+    CGFloat loadingImgY = pullDistance / 2.0 - loadingImgHeightHalf;
+    CGFloat loadingImgX = midX - loadingImgWidthHalf;
+    
+    CGRect loadingImgFrame = self.loadingImg.frame;
+    loadingImgFrame.origin.x = loadingImgX;
+    loadingImgFrame.origin.y = loadingImgY;
+    
+    self.loadingImg.frame = loadingImgFrame;
+    
+    refreshBounds.size.height = pullDistance;
+    
+    self.refreshColorView.frame = refreshBounds;
+    self.refreshLoadingView.frame = refreshBounds;
+    
+    if (refreshControl.isRefreshing && !self.isRefreshAnimating) {
+        [self animateRefreshView];
+    }
+}
+
+/**
+ * 애니메이션
+ * 로딩이미지 회전
+ */
+- (void)animateRefreshView {
+    NSArray *colorArray = @[[UIColor redColor],[UIColor blueColor],[UIColor purpleColor],[UIColor cyanColor],[UIColor orangeColor],[UIColor magentaColor]];
+    static int colorIndex = 0;
+    
+    self.isRefreshAnimating = YES;
+    
+    [UIView animateWithDuration:0.3
+                          delay:0
+                        options:UIViewAnimationOptionCurveLinear
+                     animations:^{
+                         // 로딩이미지 회전 by M_PI_2 = PI/2 = 90 degrees
+                         [self.loadingImg setTransform:CGAffineTransformRotate(self.loadingImg.transform, M_PI_2)];
+                         
+                         self.refreshColorView.backgroundColor = [colorArray objectAtIndex:colorIndex];
+                         colorIndex = (colorIndex + 1) % colorArray.count;
+                     }
+                     completion:^(BOOL finished) {
+                         if (refreshControl.isRefreshing) {
+                             [self animateRefreshView];
+                         } else {
+                             [self resetAnimation];
+                         }
+                     }];
+}
+
+/**
+ * 애니메이션 중지
+ */
+- (void)resetAnimation {
+    // Reset our flags and background color
+    self.isRefreshAnimating = NO;
+    self.refreshColorView.backgroundColor = [UIColor clearColor];
+}
+
+
+
+/*
+// 레이아웃 초기화
 - (void)initLayout {
     [self initRefreshControl];
     [_tableView addSubview:refreshControl];
 }
 
-/**
- * RefreshControl 초기화
- */
+// RefreshControl 초기화
+
 - (void)initRefreshControl {
     refreshControl = [[UIRefreshControl alloc] init];
     [refreshControl addTarget:self action:@selector(handleRefresh:) forControlEvents:UIControlEventValueChanged];
@@ -107,9 +237,8 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
     refreshControl.attributedTitle = [[NSAttributedString alloc]initWithString:@"Pull To Refresh"];
 }
 
-/**
- * Refresh 이벤트
- */
+// Refresh 이벤트
+
 - (void)handleRefresh:(UIRefreshControl *)sender {
     NSLog(@">>> handleRefresh");
     [refreshControl endRefreshing];
@@ -118,13 +247,12 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
     [_tableView reloadData];
 }
 
-
-
-
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+*/
+
 
 #pragma mark - UITableViewDataSource
 
@@ -150,6 +278,7 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
 {
     
     return self.key[section];
+    
 }
 
 
@@ -186,22 +315,27 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
 
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
+    
     UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, 20)];
     /* Create custom view to display section header... */
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(10, 5, tableView.frame.size.width, 10)];
     [label setFont:[UIFont boldSystemFontOfSize:12]];
-    NSString *string = self.key[section];//[list objectAtIndex:section];
+    NSString *string = self.key[section];;
+    
     /* Section header is in 0th index... */
     [label setText:string];
     [view addSubview:label];
-    [view setBackgroundColor:[UIColor /*clearColor]*/colorWithRed:166/255.0 green:177/255.0 blue:186/255.0 alpha:1.0]]; //your background color...
+    [view setBackgroundColor:[UIColor colorWithRed:166/255.0 green:177/255.0 blue:186/255.0 alpha:1.0]]; //your background color...
     return view;
+    
 }
 
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
+    
     return 20;
+    
 }
 
 

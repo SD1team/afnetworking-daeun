@@ -15,6 +15,7 @@
 		8188F66F1D79405B000BF3FF /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8188F66E1D79405B000BF3FF /* Images.xcassets */; };
 		8188F6721D79405B000BF3FF /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8188F6701D79405B000BF3FF /* LaunchScreen.xib */; };
 		8188F67E1D79405B000BF3FF /* afnetworking_testTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8188F67D1D79405B000BF3FF /* afnetworking_testTests.m */; };
+		81A5424C1D80FF54001B8D6E /* ic_favorite_18pt.png in Resources */ = {isa = PBXBuildFile; fileRef = 81A5424B1D80FF54001B8D6E /* ic_favorite_18pt.png */; };
 		E35F8A651D7D481D0081E5A5 /* holder.png in Resources */ = {isa = PBXBuildFile; fileRef = E35F8A641D7D481D0081E5A5 /* holder.png */; };
 /* End PBXBuildFile section */
 
@@ -44,6 +45,7 @@
 		8188F6771D79405B000BF3FF /* afnetworking_testTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = afnetworking_testTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8188F67C1D79405B000BF3FF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8188F67D1D79405B000BF3FF /* afnetworking_testTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = afnetworking_testTests.m; sourceTree = "<group>"; };
+		81A5424B1D80FF54001B8D6E /* ic_favorite_18pt.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ic_favorite_18pt.png; path = ../ic_favorite_18pt.png; sourceTree = "<group>"; };
 		A7401205FA6FE8908DCA1327 /* Pods-afnetworking_test.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-afnetworking_test.debug.xcconfig"; path = "Pods/Target Support Files/Pods-afnetworking_test/Pods-afnetworking_test.debug.xcconfig"; sourceTree = "<group>"; };
 		E35F8A641D7D481D0081E5A5 /* holder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = holder.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -100,6 +102,7 @@
 		8188F6601D79405B000BF3FF /* afnetworking_test */ = {
 			isa = PBXGroup;
 			children = (
+				81A5424B1D80FF54001B8D6E /* ic_favorite_18pt.png */,
 				8188F6651D79405B000BF3FF /* AppDelegate.h */,
 				8188F6661D79405B000BF3FF /* AppDelegate.m */,
 				8188F6681D79405B000BF3FF /* ViewController.h */,
@@ -231,6 +234,7 @@
 			files = (
 				8188F66D1D79405B000BF3FF /* Main.storyboard in Resources */,
 				8188F6721D79405B000BF3FF /* LaunchScreen.xib in Resources */,
+				81A5424C1D80FF54001B8D6E /* ic_favorite_18pt.png in Resources */,
 				8188F66F1D79405B000BF3FF /* Images.xcassets in Resources */,
 				E35F8A651D7D481D0081E5A5 /* holder.png in Resources */,
 			);

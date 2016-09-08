@@ -22,4 +22,15 @@
 @property (strong, nonatomic) NSMutableDictionary *section;
 
 @property NSInteger rowNo;
+
+// UIRefreshControl 배경
+@property (strong, nonatomic) UIView *refreshColorView;
+// 로딩이미지의 투명배경
+@property (strong, nonatomic) UIView *refreshLoadingView;
+// 로딩이미지
+@property (strong, nonatomic) UIImageView *loadingImg;
+// 리프레싱 하고 있는지 여부
+@property (assign) BOOL isRefreshAnimating;
+
+
 @end
