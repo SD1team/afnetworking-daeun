@@ -11,7 +11,9 @@
 #import <AFNetworking/UIImageView+AFNetworking.h>
 
 @interface ViewController : UIViewController<UITableViewDataSource,UITableViewDelegate>
-
+{
+    UIRefreshControl *refreshControl;
+}
 
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
 

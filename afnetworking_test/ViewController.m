@@ -44,12 +44,12 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
             self.key = [NSMutableArray array];
             
             [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:SectionsTableIdentifier];
-         
+            
             
             for (NSDictionary *dic in results)
             {
                 // Reduce event start date to date components (year, month, day)
-              
+                
                 //NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
                 //[dateFormatter setDateFormat:@"yyyy-MM-dd"];
                 //NSDate* date = [dateFormatter dateFromString:[dic objectForKey:@"release_date"]];
@@ -70,19 +70,56 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
             }
             NSArray *unsortedDays = [self.section allKeys];
             self.key = [NSMutableArray arrayWithArray:[unsortedDays sortedArrayUsingSelector:@selector(compare:)]];
-           
+            
         }
         
         
         [self.tableView reloadData];
         
+        
+        
         //NSLog(@"self.date = %@", date);
-       // NSLog(@"self.key = %@", self.key);
+        // NSLog(@"self.key = %@", self.key);
         
     }];
     
     [dataTask resume];
+    [self initLayout];
+    
 }
+
+
+/**
+ * 레이아웃 초기화
+ */
+- (void)initLayout {
+    [self initRefreshControl];
+    [_tableView addSubview:refreshControl];
+}
+
+/**
+ * RefreshControl 초기화
+ */
+- (void)initRefreshControl {
+    refreshControl = [[UIRefreshControl alloc] init];
+    [refreshControl addTarget:self action:@selector(handleRefresh:) forControlEvents:UIControlEventValueChanged];
+    
+    refreshControl.attributedTitle = [[NSAttributedString alloc]initWithString:@"Pull To Refresh"];
+}
+
+/**
+ * Refresh 이벤트
+ */
+- (void)handleRefresh:(UIRefreshControl *)sender {
+    NSLog(@">>> handleRefresh");
+    [refreshControl endRefreshing];
+    
+    // refresh
+    [_tableView reloadData];
+}
+
+
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -174,7 +211,7 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
     NSDate* dateKey = self.key[indexPath.section];
     NSMutableArray* dataArry = [self.section objectForKey:dateKey];
     NSDictionary* section = [dataArry objectAtIndex:rowNo];
-
+    
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Overview"
                                                    message:[section objectForKey:@"overview"]
                                                   delegate:self
@@ -183,7 +220,7 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
     
     // alert창을 띄우는 method는 show이다.
     [alert show];
-
+    
 }
 
 @end
