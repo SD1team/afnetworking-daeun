@@ -19,7 +19,7 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
 
 @implementation ViewController
 
-@synthesize results, key, section;
+@synthesize results, key, rowNo;
 
 
 - (void)viewDidLoad {
@@ -69,14 +69,15 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
                 [eventsOnThisDay addObject:dic];
             }
             NSArray *unsortedDays = [self.section allKeys];
-            self.key = [unsortedDays sortedArrayUsingSelector:@selector(compare:)];
+            self.key = [NSMutableArray arrayWithArray:[unsortedDays sortedArrayUsingSelector:@selector(compare:)]];
+           
         }
         
         
         [self.tableView reloadData];
         
         //NSLog(@"self.date = %@", date);
-        NSLog(@"self.key = %@", self.key);
+       // NSLog(@"self.key = %@", self.key);
         
     }];
     
@@ -130,8 +131,6 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:SectionsTableIdentifier];
     }
     
-    
-    
     NSString *urlString = [NSString stringWithFormat:@"http://image.tmdb.org/t/p/w500%@", [section objectForKey:@"poster_path"]];
     [cell.imageView setImageWithURL:[NSURL URLWithString:urlString] placeholderImage:[UIImage imageNamed:@"holder"]];
     
@@ -146,6 +145,45 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
     
     return cell;
     
+}
+
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, 20)];
+    /* Create custom view to display section header... */
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(10, 5, tableView.frame.size.width, 10)];
+    [label setFont:[UIFont boldSystemFontOfSize:12]];
+    NSString *string = self.key[section];//[list objectAtIndex:section];
+    /* Section header is in 0th index... */
+    [label setText:string];
+    [view addSubview:label];
+    [view setBackgroundColor:[UIColor /*clearColor]*/colorWithRed:166/255.0 green:177/255.0 blue:186/255.0 alpha:1.0]]; //your background color...
+    return view;
+}
+
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 20;
+}
+
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    NSDate* dateKey = self.key[indexPath.section];
+    NSMutableArray* dataArry = [self.section objectForKey:dateKey];
+    NSDictionary* section = [dataArry objectAtIndex:rowNo];
+
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Overview"
+                                                   message:[section objectForKey:@"overview"]
+                                                  delegate:self
+                                         cancelButtonTitle:@"닫기"    /* nil 로 지정할 경우 cancel button 없음 */
+                                         otherButtonTitles: nil];
+    
+    // alert창을 띄우는 method는 show이다.
+    [alert show];
+
 }
 
 @end
