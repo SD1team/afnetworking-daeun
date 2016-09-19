@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+
 #import <AFNetworking/AFNetworking.h>
 
 
@@ -19,7 +20,7 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
 
 @implementation ViewController
 
-@synthesize results, key, rowNo;
+@synthesize results, key, rowNo, genreDataResults, genreDic;
 
 
 - (void)viewDidLoad {
@@ -28,17 +29,18 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
     // Do any additional setup after loading the view, typically from a nib.
     
     NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    
     AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:configuration];
     
     NSURL *URL = [NSURL URLWithString:@"http://api.themoviedb.org/3/movie/now_playing?api_key=d74a7e1423e9267f335de909f5a25f84"];
     NSURLRequest *request = [NSURLRequest requestWithURL:URL];
     
-    NSURLSessionDataTask *dataTask = [manager dataTaskWithRequest:request completionHandler:^(NSURLResponse *response, id responseObject, NSError *error) {
-        if (error || responseObject == nil) {
+    NSURLSessionDataTask *dataTask = [manager dataTaskWithRequest:request completionHandler:^(NSURLResponse *response, id genreResponseObject, NSError *error) {
+        if (error || genreResponseObject == nil) {
             NSLog(@"Error: %@", error);
         } else {
             
-            results = [responseObject objectForKey:@"results"];
+            results = [genreResponseObject objectForKey:@"results"];
             
             self.section = [NSMutableDictionary dictionary];
             self.key = [NSMutableArray array];
@@ -73,18 +75,43 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
             
         }
         
-        
         [self.tableView reloadData];
         
-        //NSLog(@"self.date = %@", date);
-        // NSLog(@"self.key = %@", self.key);
+    }];
+    
+    
+    
+    NSURL *genreURL = [NSURL URLWithString:@"http://api.themoviedb.org/3/genre/movie/list?api_key=d74a7e1423e9267f335de909f5a25f84"];
+    NSURLRequest *genreRequest = [NSURLRequest requestWithURL:genreURL];
+
+    NSURLSessionDataTask *genreDataTask = [manager dataTaskWithRequest:genreRequest completionHandler:^(NSURLResponse *response, id responseObject, NSError *error) {
+       if (error || responseObject == nil)
+       {
+            NSLog(@"genreDataTask Error: %@", error);
+       }
+       else
+       {
+            genreDataResults = [responseObject objectForKey:@"genres"];
+           
+            self.genreDic = [[NSMutableDictionary alloc] init];
+            for(NSDictionary* genre in genreDataResults)
+            {
+                [self.genreDic setObject:[genre objectForKey:@"name"] forKey:[genre objectForKey:@"id"]];
+            }
+        }
+        
+        [self.tableView reloadData];
         
     }];
     
     [dataTask resume];
+    [genreDataTask resume];
+
+    
     [self initCustomRefreshControl];
     
 }
+
 
 #pragma mark - PullToRefresh
 
@@ -145,7 +172,7 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
  * 로딩이미지 위치 계산
  */
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-
+    
     // RefreshControl 크기
     CGRect refreshBounds = refreshControl.bounds;
     
@@ -222,36 +249,36 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
 
 
 /*
-// 레이아웃 초기화
-- (void)initLayout {
-    [self initRefreshControl];
-    [_tableView addSubview:refreshControl];
-}
-
-// RefreshControl 초기화
-
-- (void)initRefreshControl {
-    refreshControl = [[UIRefreshControl alloc] init];
-    [refreshControl addTarget:self action:@selector(handleRefresh:) forControlEvents:UIControlEventValueChanged];
-    
-    refreshControl.attributedTitle = [[NSAttributedString alloc]initWithString:@"Pull To Refresh"];
-}
-
-// Refresh 이벤트
-
-- (void)handleRefresh:(UIRefreshControl *)sender {
-    NSLog(@">>> handleRefresh");
-    [refreshControl endRefreshing];
-    
-    // refresh
-    [_tableView reloadData];
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-*/
+ // 레이아웃 초기화
+ - (void)initLayout {
+ [self initRefreshControl];
+ [_tableView addSubview:refreshControl];
+ }
+ 
+ // RefreshControl 초기화
+ 
+ - (void)initRefreshControl {
+ refreshControl = [[UIRefreshControl alloc] init];
+ [refreshControl addTarget:self action:@selector(handleRefresh:) forControlEvents:UIControlEventValueChanged];
+ 
+ refreshControl.attributedTitle = [[NSAttributedString alloc]initWithString:@"Pull To Refresh"];
+ }
+ 
+ // Refresh 이벤트
+ 
+ - (void)handleRefresh:(UIRefreshControl *)sender {
+ NSLog(@">>> handleRefresh");
+ [refreshControl endRefreshing];
+ 
+ // refresh
+ [_tableView reloadData];
+ }
+ 
+ - (void)didReceiveMemoryWarning {
+ [super didReceiveMemoryWarning];
+ // Dispose of any resources that can be recreated.
+ }
+ */
 
 
 #pragma mark - UITableViewDataSource
@@ -276,9 +303,7 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    
     return self.key[section];
-    
 }
 
 
@@ -294,12 +319,13 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
     
     if(cell == nil)
     {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:SectionsTableIdentifier];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:SectionsTableIdentifier];
     }
     
     NSString *urlString = [NSString stringWithFormat:@"http://image.tmdb.org/t/p/w500%@", [section objectForKey:@"poster_path"]];
     [cell.imageView setImageWithURL:[NSURL URLWithString:urlString] placeholderImage:[UIImage imageNamed:@"holder"]];
     
+ 
     /*
      NSURL *url = [NSURL URLWithString:urlString];
      NSData *data = [NSData dataWithContentsOfURL:url];
@@ -307,7 +333,18 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
      cell.imageView.image = image;
      */
     
+    NSString* genreStr = @"GENRE: ";
+    int cnt = 0;
+    for(id gid in [section objectForKey:@"genre_ids"]) {
+        cnt++;
+        genreStr = [genreStr stringByAppendingFormat:@"%@", [self.genreDic objectForKey:gid]];
+        if (cnt < [[section objectForKey:@"genre_ids"] count]) {
+            genreStr = [genreStr stringByAppendingString:@", "];
+        }
+    }
+
     cell.textLabel.text = [section objectForKey:@"title"];
+    cell.detailTextLabel.text = @"aa";//genreStr;
     
     return cell;
     
@@ -318,14 +355,16 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
     
     UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, 20)];
     /* Create custom view to display section header... */
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(10, 5, tableView.frame.size.width, 10)];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, tableView.frame.size.width, 20)];
     [label setFont:[UIFont boldSystemFontOfSize:12]];
-    NSString *string = self.key[section];;
+    NSString *string = self.key[section];
     
     /* Section header is in 0th index... */
     [label setText:string];
     [view addSubview:label];
-    [view setBackgroundColor:[UIColor colorWithRed:166/255.0 green:177/255.0 blue:186/255.0 alpha:1.0]]; //your background color...
+    [view setBackgroundColor:[UIColor colorWithRed:187/255.0 green:227/255.0 blue:233/255.0 alpha:1.0]]; //your background color...
+
+    //[self.tableView reloadData];
     return view;
     
 }
@@ -333,7 +372,7 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
-    
+    //[self.tableView reloadData];
     return 20;
     
 }
@@ -346,15 +385,52 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
     NSMutableArray* dataArry = [self.section objectForKey:dateKey];
     NSDictionary* section = [dataArry objectAtIndex:rowNo];
     
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Overview"
-                                                   message:[section objectForKey:@"overview"]
+    NSString* genreStr = @"GENRE: ";
+    int cnt = 0;
+    for(id gid in [section objectForKey:@"genre_ids"]) {
+        cnt++;
+        genreStr = [genreStr stringByAppendingFormat:@"%@", [self.genreDic objectForKey:gid]];
+        if (cnt < [[section objectForKey:@"genre_ids"] count]) {
+            genreStr = [genreStr stringByAppendingString:@", "];
+        }
+    }
+    
+    NSString* alertMsg = [NSString stringWithFormat:@"RELEASE DATE: %@\n\n%@\n\nOVERVIEW\n%@",
+                          [section objectForKey:@"release_date"], genreStr, [section objectForKey:@"overview"]];
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:[section objectForKey:@"title"]
+                                                   message:alertMsg
                                                   delegate:self
-                                         cancelButtonTitle:@"닫기"    /* nil 로 지정할 경우 cancel button 없음 */
+                                         cancelButtonTitle:@"닫기"    //nil 로 지정할 경우 cancel button 없음
                                          otherButtonTitles: nil];
     
     // alert창을 띄우는 method는 show이다.
     [alert show];
     
+}
+
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return UITableViewCellEditingStyleDelete;
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if(editingStyle == UITableViewCellEditingStyleDelete)
+    {
+        NSDate* dateKey = self.key[indexPath.section];
+        
+        [self.section[dateKey] removeObjectAtIndex:indexPath.row];
+        [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
+                              withRowAnimation:UITableViewRowAnimationFade];
+        
+        [self.tableView reloadData];
+    }
+
+}
+
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return YES;
 }
 
 @end

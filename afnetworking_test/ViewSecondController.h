@@ -1,21 +1,19 @@
 //
-//  ViewController.h
+//  ViewSecondController.h
 //  afnetworking_test
 //
-//  Created by iOS on 2016. 9. 2..
+//  Created by iOS on 2016. 9. 8..
 //  Copyright (c) 2016년 iOS. All rights reserved.
 //
 
+#ifndef afnetworking_test_ViewSecondController_h
+#define afnetworking_test_ViewSecondController_h
+
 #import <UIKit/UIKit.h>
 
-#import <AFNetworking/UIImageView+AFNetworking.h>
+@interface ViewSecondController : UIViewController<UITableViewDelegate, UITableViewDataSource>
 
-@interface ViewController : UIViewController<UITableViewDataSource, UITableViewDelegate>
-{
-    UIRefreshControl *refreshControl;
-}
-
-@property (strong, nonatomic) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet UITableView *secondTableView;
 
 @property (copy, nonatomic) NSArray *results;
 @property (copy, nonatomic) NSMutableArray *key;
@@ -32,8 +30,12 @@
 // 리프레싱 하고 있는지 여부
 @property (assign) BOOL isRefreshAnimating;
 
+@property (copy, nonatomic) NSArray *popularityResults;
+@property (nonatomic, retain) NSMutableDictionary* popularityDic;
+@property (copy, nonatomic) NSMutableArray *popArr;
 
-@property (copy, nonatomic) NSArray *genreDataResults;
-@property (nonatomic, retain) NSMutableDictionary* genreDic;
 
 @end
+
+
+#endif
